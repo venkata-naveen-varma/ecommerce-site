@@ -1,10 +1,9 @@
 import express from 'express';
-import mongoose from 'mongoose';
-import jwt from 'jsonwebtoken';
-import multer from 'multer';
 import path from 'path';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { connectToDB } from './utils.js';
+import indexRoutes from './routes/indexRoutes.js';
 
 dotenv.config();
 
@@ -14,20 +13,13 @@ const port = process.env.PORT || 4000;
 app.use(express.json());
 app.use(cors());
 
-// DB connection with mongodb
-mongoose.connect(process.env.DB_CONNECTION);
+app.use("", indexRoutes);
 
-app.get('/', (req,res)=>{
-    res.send("Express app running...");
-})
-
-
-
-
-app.listen(port, (error)=>{
-    if(!error){
-        console.log("Server running on port ", port);
-    }else{
-        console.log("Error:", error);
+(async function init() {
+    try {
+        await connectToDB();
+        app.listen(port, () => console.log(`Server is listening on port ${port}`));
+    } catch (err) {
+        console.warn(err);
     }
-})
+}());
